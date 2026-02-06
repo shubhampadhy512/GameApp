@@ -508,37 +508,6 @@ Transform:
   - {fileID: 517106791}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1030527499
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1030527500}
-  m_Layer: 0
-  m_Name: groundchecker
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1030527500
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1030527499}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.042554308, y: -2.1979287, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1949844238}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1307863900
 GameObject:
   m_ObjectHideFlags: 0
@@ -1250,6 +1219,7 @@ GameObject:
   - component: {fileID: 1949844241}
   - component: {fileID: 1949844244}
   - component: {fileID: 1949844246}
+  - component: {fileID: 1949844249}
   - component: {fileID: 1949844245}
   - component: {fileID: 1949844247}
   - component: {fileID: 1949844248}
@@ -1272,8 +1242,7 @@ Transform:
   m_LocalPosition: {x: -7.2548647, y: 5.734604, z: 0}
   m_LocalScale: {x: 0.7, y: 0.5402315, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1030527500}
+  m_Children: []
   m_Father: {fileID: 1378121074}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1839735485 &1949844241
@@ -1459,8 +1428,8 @@ MonoBehaviour:
     m_ActionName: 'Player/Crouch[/Keyboard/c]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1949844246}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+      - m_Target: {fileID: 1949844249}
+        m_TargetAssemblyTypeName: TouchingDirection, Assembly-CSharp
         m_MethodName: OnJump
         m_Mode: 0
         m_Arguments:
@@ -1542,24 +1511,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a3836c02a29a6d4a9003704339e9c6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  speed: 5
-  jumpForce: 10
-  groundFilter:
-    useTriggers: 0
-    useLayerMask: 0
-    useDepth: 0
-    useOutsideDepth: 0
-    useNormalAngle: 0
-    useOutsideNormalAngle: 0
-    layerMask:
-      serializedVersion: 2
-      m_Bits: 64
-    minDepth: 0
-    maxDepth: 0
-    minNormalAngle: 0
-    maxNormalAngle: 0
   _isMoving: 0
   _isFacingRight: 1
+  speed: 5
 --- !u!95 &1949844247
 Animator:
   serializedVersion: 7
@@ -1617,8 +1571,26 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 4.5}
+  m_Size: {x: 1, y: 5}
   m_Direction: 0
+--- !u!114 &1949844249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949844237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27e263eafcef5c24b9dc18eb266bf93e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  jumpForce: 6
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  groundCheckOffset: {x: 0, y: -0.02}
+  groundCheckWidthPercent: 0.9
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

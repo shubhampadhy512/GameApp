@@ -4,41 +4,34 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-
     Vector2 moveInput;
+
+    [Header("Movement Settings")]
+    public float speed = 5f;
+    public float jumpForce = 10f;
+
+    [Header("Ground Check")]
+    public ContactFilter2D groundFilter;
+    private bool _isGrounded;
+
     [SerializeField]
     private bool _isMoving = false;
     public bool IsMoving
     {
-        get
-        {
-            return _isMoving;
-        }
-        private set
-        {
-            _isMoving = value;
-            animator.SetBool("isMoving", value);
-        }
+        get => _isMoving;
+        private set { _isMoving = value; animator.SetBool("isMoving", value); }
     }
 
     public bool _isFacingRight = true;
     public bool IsFacingRight
     {
-        get
-        {
-            return _isFacingRight;
-        }
+        get => _isFacingRight;
         private set
         {
-            if (_isFacingRight != value)
-            {
-                transform.localScale *= new Vector2(-1,1);
-            }
-            _isFacingRight=value;
+            if (_isFacingRight != value) transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+            _isFacingRight = value;
         }
     }
-
-    public float speed = 5f;
 
     Animator animator;
     Rigidbody2D rg;
@@ -51,10 +44,10 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rg.linearVelocity = new Vector2(
-            moveInput.x * speed,
-            rg.linearVelocity.y
-        );
+        // This uses the "Ground Filter" you set in the Inspector!
+        _isGrounded = rg.IsTouching(groundFilter);
+
+        rg.linearVelocity = new Vector2(moveInput.x * speed, rg.linearVelocity.y);
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -63,15 +56,20 @@ public class PlayerController : MonoBehaviour
         IsMoving = moveInput != Vector2.zero;
         SetFacingDirection(moveInput);
     }
+
+    // THIS HANDLES SPACE AND PAGE UP
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.started && _isGrounded)
+        {
+            rg.linearVelocity = new Vector2(rg.linearVelocity.x, jumpForce);
+            // animator.SetTrigger("jump"); // Uncomment if you have a jump animation
+        }
+    }
+
     private void SetFacingDirection(Vector2 moveInput)
     {
-        if (moveInput.x > 0 && !IsFacingRight)
-        {
-            IsFacingRight = true;
-        }
-        else if (moveInput.x < 0 && IsFacingRight)
-        {
-            IsFacingRight = false;
-        }
+        if (moveInput.x > 0 && !IsFacingRight) IsFacingRight = true;
+        else if (moveInput.x < 0 && IsFacingRight) IsFacingRight = false;
     }
 }
