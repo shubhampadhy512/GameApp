@@ -2,74 +2,110 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(Collider2D))]
 public class PlayerController : MonoBehaviour
 {
-    Vector2 moveInput;
+    // Components
+    private Rigidbody2D rb;
+    private Animator animator;
 
+    // Movement
+    private Vector2 moveInput;
     [Header("Movement Settings")]
     public float speed = 5f;
-    public float jumpForce = 10f;
+    public float jumpForce = 7f;
 
+    // Ground check
     [Header("Ground Check")]
     public ContactFilter2D groundFilter;
-    private bool _isGrounded;
+    private bool isGrounded;
 
-    [SerializeField]
-    private bool _isMoving = false;
-    public bool IsMoving
+    // Facing
+    private bool isFacingRight = true;
+    private bool isMoving;
+
+    // Animator params
+    private const string IS_MOVING = "isMoving";
+    private const string IS_GROUNDED = "isGrounded";
+    private const string ATTACK_TRIGGER = "Attack";
+    private const string ATTACK_STATE = "attack_1"; // animation state name
+
+    private void OnEnable()
     {
-        get => _isMoving;
-        private set { _isMoving = value; animator.SetBool("isMoving", value); }
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
-
-    public bool _isFacingRight = true;
-    public bool IsFacingRight
-    {
-        get => _isFacingRight;
-        private set
-        {
-            if (_isFacingRight != value) transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
-            _isFacingRight = value;
-        }
-    }
-
-    Animator animator;
-    Rigidbody2D rg;
 
     private void Awake()
     {
-        rg = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
     }
 
     private void FixedUpdate()
     {
-        // This uses the "Ground Filter" you set in the Inspector!
-        _isGrounded = rg.IsTouching(groundFilter);
+        // Ground check
+        isGrounded = rb.IsTouching(groundFilter);
+        animator.SetBool(IS_GROUNDED, isGrounded);
 
-        rg.linearVelocity = new Vector2(moveInput.x * speed, rg.linearVelocity.y);
+        // If attack animation is playing → lock movement
+        if (IsAttacking())
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            animator.SetBool(IS_MOVING, false);
+            return;
+        }
+
+        // Normal movement
+        rb.linearVelocity = new Vector2(moveInput.x * speed, rb.linearVelocity.y);
+        animator.SetBool(IS_MOVING, isMoving);
     }
+
+    // ================= INPUT =================
 
     public void OnMove(InputAction.CallbackContext context)
     {
+        if (IsAttacking()) return;
+
         moveInput = context.ReadValue<Vector2>();
-        IsMoving = moveInput != Vector2.zero;
-        SetFacingDirection(moveInput);
+        isMoving = Mathf.Abs(moveInput.x) > 0.01f;
+
+        if (moveInput.x > 0 && !isFacingRight)
+            Flip();
+        else if (moveInput.x < 0 && isFacingRight)
+            Flip();
     }
 
-    // THIS HANDLES SPACE AND PAGE UP
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.started && _isGrounded)
+        if (context.performed && isGrounded && !IsAttacking())
         {
-            rg.linearVelocity = new Vector2(rg.linearVelocity.x, jumpForce);
-            // animator.SetTrigger("jump"); // Uncomment if you have a jump animation
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
     }
 
-    private void SetFacingDirection(Vector2 moveInput)
+    public void OnAttack(InputAction.CallbackContext context)
     {
-        if (moveInput.x > 0 && !IsFacingRight) IsFacingRight = true;
-        else if (moveInput.x < 0 && IsFacingRight) IsFacingRight = false;
+        if (!context.performed) return;
+        if (IsAttacking()) return;
+
+        animator.ResetTrigger("Attack");
+        animator.SetTrigger("Attack");
+    }
+
+    // ================= HELPERS =================
+
+    private bool IsAttacking()
+    {
+        return animator.GetCurrentAnimatorStateInfo(0).IsName(ATTACK_STATE);
+    }
+
+    private void Flip()
+    {
+        isFacingRight = !isFacingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
     }
 }
