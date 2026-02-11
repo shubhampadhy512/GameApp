@@ -145,8 +145,8 @@ Transform:
   m_GameObject: {fileID: 517106790}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.8336, y: 1.8536811, z: 0}
-  m_LocalScale: {x: 1.8877132, y: 0.71312046, z: 1}
+  m_LocalPosition: {x: -2.8336, y: 1.85368, z: 0}
+  m_LocalScale: {x: 1.4970449, y: 1.3641, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 817148231}
@@ -200,7 +200,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7123812923137563172, guid: 0fbd5e0ad217c5643951988828b8cd31, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8d122b0d3f7a7b468fc38f967e8c5cd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -494,6 +494,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   walkSpeed: 3
+  player: {fileID: 7304092665827838934, guid: e877891367ef6884a811ceb0d2f930d0, type: 3}
 --- !u!95 &640910483
 Animator:
   serializedVersion: 7
@@ -1294,8 +1295,8 @@ GameObject:
   - component: {fileID: 1949844245}
   - component: {fileID: 1949844248}
   m_Layer: 0
-  m_Name: Player
-  m_TagString: Player
+  m_Name: player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1595,7 +1596,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   speed: 5
-  jumpForce: 8
+  jumpForce: 7
   groundFilter:
     useTriggers: 0
     useLayerMask: 1
@@ -1677,37 +1678,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: -82057603268848388, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
-      propertyPath: m_Size.x
-      value: 2.923332
-      objectReference: {fileID: 0}
-    - target: {fileID: -82057603268848388, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
-      propertyPath: m_Size.y
-      value: 5.4600005
-      objectReference: {fileID: 0}
-    - target: {fileID: -82057603268848388, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
-      propertyPath: m_Offset.x
-      value: 0.24999976
-      objectReference: {fileID: 0}
-    - target: {fileID: -82057603268848388, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
-      propertyPath: m_Offset.y
-      value: 0.08333404
-      objectReference: {fileID: 0}
-    - target: {fileID: 5760143143744879983, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1.0784401
-      objectReference: {fileID: 0}
-    - target: {fileID: 5760143143744879983, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.80160004
-      objectReference: {fileID: 0}
     - target: {fileID: 5760143143744879983, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.66588
+      value: 5.16588
       objectReference: {fileID: 0}
     - target: {fileID: 5760143143744879983, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.55021
+      value: -2.05021
       objectReference: {fileID: 0}
     - target: {fileID: 5760143143744879983, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1744,10 +1721,6 @@ PrefabInstance:
     - target: {fileID: 7743016622259435934, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
       propertyPath: m_Name
       value: Enemy
-      objectReference: {fileID: 0}
-    - target: {fileID: 7743016622259435934, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
-      propertyPath: m_TagString
-      value: Untagged
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
