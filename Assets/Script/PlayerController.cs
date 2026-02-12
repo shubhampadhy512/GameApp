@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
 
     // Facing
-    private bool isFacingRight = true;
+    private bool isFacingRight = false;
     private bool isMoving;
 
     // Animator params
