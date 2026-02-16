@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class Demogorgan : MonoBehaviour
 {
+    [Header("Movement")]
     public float walkSpeed = 3f;
 
     private Rigidbody2D rb;
@@ -12,6 +13,8 @@ public class Demogorgan : MonoBehaviour
     private SpriteRenderer sr;
 
     private Transform player;
+
+    private bool isFalling = false;
 
     private void Awake()
     {
@@ -22,8 +25,8 @@ public class Demogorgan : MonoBehaviour
 
     private void Start()
     {
-        // Automatically find player
         GameObject p = GameObject.FindGameObjectWithTag("Player");
+
         if (p != null)
         {
             player = p.transform;
@@ -36,11 +39,11 @@ public class Demogorgan : MonoBehaviour
 
     private void Update()
     {
-        if (player == null) return;
+        if (player == null || isFalling) return;
 
         float direction = player.position.x - transform.position.x;
 
-        // Flip sprite
+        // Flip sprite based on direction
         if (direction > 0)
             sr.flipX = false;
         else if (direction < 0)
@@ -52,7 +55,7 @@ public class Demogorgan : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (player == null) return;
+        if (player == null || isFalling) return;
 
         float direction = player.position.x - rb.position.x;
 
@@ -60,5 +63,23 @@ public class Demogorgan : MonoBehaviour
             Mathf.Sign(direction) * walkSpeed,
             rb.linearVelocity.y
         );
+    }
+
+    // 🔥 Called when player hits enemy
+    public void Fall()
+    {
+        if (isFalling) return;
+
+        isFalling = true;
+
+        // Stop movement
+        rb.linearVelocity = Vector2.zero;
+
+        // Stop walking animation
+        anim.SetBool("isWalking", false);
+
+        // Trigger fall animation
+        anim.ResetTrigger("Falling");   // safety reset
+        anim.SetTrigger("Falling");
     }
 }
