@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b865b4624e19abd4eb093c64769715ab
+guid: 295f51f81fbb73b4b851fcbfc3a2f6c0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3144489470803264081
-    second: walking_002_0
+      213: -2346302928887187388
+    second: bullet_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: walking_002_0
+      name: bullet_0
       rect:
         serializedVersion: 2
-        x: 13
-        y: 23
-        width: 209
-        height: 457
+        x: 5
+        y: 1
+        width: 38
+        height: 17
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fadb0dc8c778c54d0800000000000000
-      internalID: -3144489470803264081
+      spriteID: 448783cdae1407fd0800000000000000
+      internalID: -2346302928887187388
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      walking_002_0: -3144489470803264081
+      bullet_0: -2346302928887187388
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

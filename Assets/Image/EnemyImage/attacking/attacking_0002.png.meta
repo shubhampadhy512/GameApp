@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b865b4624e19abd4eb093c64769715ab
+guid: 88cf28ee59039bc419478da2ba7659f1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3144489470803264081
-    second: walking_002_0
+      213: -6409213320313829522
+    second: attacking_0002_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: walking_002_0
+      name: attacking_0002_0
       rect:
         serializedVersion: 2
-        x: 13
-        y: 23
-        width: 209
-        height: 457
+        x: 0
+        y: 5
+        width: 461
+        height: 462
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fadb0dc8c778c54d0800000000000000
-      internalID: -3144489470803264081
+      spriteID: e670ef05176ed07a0800000000000000
+      internalID: -6409213320313829522
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      walking_002_0: -3144489470803264081
+      attacking_0002_0: -6409213320313829522
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
