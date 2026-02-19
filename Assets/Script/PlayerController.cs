@@ -4,11 +4,13 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Collider2D))]
+[RequireComponent(typeof(Damageable))] // Added: Ensure Damageable exists
 public class PlayerController : MonoBehaviour
 {
     // Components
     private Rigidbody2D rb;
     private Animator animator;
+    private Damageable damageable; // Added reference
 
     // Movement
     private Vector2 moveInput;
@@ -29,18 +31,13 @@ public class PlayerController : MonoBehaviour
     private const string IS_MOVING = "isMoving";
     private const string IS_GROUNDED = "isGrounded";
     private const string ATTACK_TRIGGER = "Attack";
-    private const string ATTACK_STATE = "attack_1"; // animation state name
-
-    private void OnEnable()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-    }
+    private const string ATTACK_STATE = "attack_1";
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        damageable = GetComponent<Damageable>(); // Initialize damageable
     }
 
     private void FixedUpdate()
@@ -48,6 +45,13 @@ public class PlayerController : MonoBehaviour
         // Ground check
         isGrounded = rb.IsTouching(groundFilter);
         animator.SetBool(IS_GROUNDED, isGrounded);
+
+        // Changes: Check LockVelocity from Damageable script
+        // If the character is being hit/knocked back, do not process move input
+        if (damageable.LockVelocity)
+        {
+            return;
+        }
 
         // If attack animation is playing → lock movement
         if (IsAttacking())
@@ -66,7 +70,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        if (IsAttacking()) return;
+        // Added: Prevent flipping or updating input during knockback/hit
+        if (IsAttacking() || damageable.LockVelocity) return;
 
         moveInput = context.ReadValue<Vector2>();
         isMoving = Mathf.Abs(moveInput.x) > 0.01f;
@@ -79,7 +84,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.performed && isGrounded && !IsAttacking())
+        // Added: Prevent jumping during hit
+        if (context.performed && isGrounded && !IsAttacking() && !damageable.LockVelocity)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
@@ -88,10 +94,11 @@ public class PlayerController : MonoBehaviour
     public void OnAttack(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
-        if (IsAttacking()) return;
+        // Added: Prevent attacking during hit
+        if (IsAttacking() || damageable.LockVelocity) return;
 
-        animator.ResetTrigger("Attack");
-        animator.SetTrigger("Attack");
+        animator.ResetTrigger(ATTACK_TRIGGER);
+        animator.SetTrigger(ATTACK_TRIGGER);
     }
 
     // ================= HELPERS =================
@@ -107,5 +114,14 @@ public class PlayerController : MonoBehaviour
         Vector3 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;
+    }
+
+    // ================= DAMAGE & KNOCKBACK =================
+
+    public void OnHit(int damage, Vector2 knockback)
+    {
+        // The Damageable script calls this via Unity Event. 
+        // We set the velocity immediately to the knockback vector.
+        rb.linearVelocity = new Vector2(knockback.x, rb.linearVelocity.y + knockback.y);
     }
 }
