@@ -86,19 +86,15 @@ public class Damageable : MonoBehaviour
         {
             Health -= damage;
             isInvincible = true;
+            timeSinceHit = 0; // Reset the timer here!
 
-            // Trigger the "hit" animation in the Animator
             animator.SetTrigger("hit");
-
-            // Lock the velocity so movement code doesn't override knockback
             LockVelocity = true;
-
-            // Invoke the event so the PlayerController/Enemy script can apply the physical force
             damageableHit?.Invoke(damage, knockback);
+            Debug.Log(Health);
 
             return true;
         }
-
         return false;
     }
 }
