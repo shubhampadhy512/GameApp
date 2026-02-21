@@ -7,23 +7,28 @@ public class Attack : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Check if the target is damageable
-        Damageable damageable = collision.GetComponent<Damageable>();
+        Debug.Log("I touched: " + collision.name);
+
+        // Change GetComponent to GetComponentInParent
+        Damageable damageable = collision.GetComponentInParent<Damageable>();
 
         if (damageable != null)
         {
-            // Calculate knockback direction based on facing direction
-            Vector2 deliveredKnockback = transform.parent.localScale.x > 0 
-                ? knockback 
+            Vector2 deliveredKnockback = transform.parent.localScale.x > 0
+                ? knockback
                 : new Vector2(-knockback.x, knockback.y);
 
-            // Hit the target
             bool gotHit = damageable.Hit(attackDamage, deliveredKnockback);
 
             if (gotHit)
             {
                 Debug.Log(collision.name + " hit for " + attackDamage);
             }
+        }
+        else
+        {
+            // This will tell us if the script is still missing
+            Debug.Log("Touched " + collision.name + " but no Damageable script found!");
         }
     }
 }

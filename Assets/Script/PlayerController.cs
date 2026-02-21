@@ -118,10 +118,19 @@ public class PlayerController : MonoBehaviour
 
     // ================= DAMAGE & KNOCKBACK =================
 
-    public void OnHit(int damage, Vector2 knockback)
-    {
-        // The Damageable script calls this via Unity Event. 
-        // We set the velocity immediately to the knockback vector.
-        rb.linearVelocity = new Vector2(knockback.x, rb.linearVelocity.y + knockback.y);
+ public void OnHit(int damage, Vector2 knockback)
+{
+    // Apply knockback physics
+    rb.linearVelocity = new Vector2(knockback.x, rb.linearVelocity.y + knockback.y);
+
+    // Force player to face the enemy that hit them
+    // If knockback is positive, enemy is on the left, so player should face left
+    if (knockback.x > 0 && isFacingRight) {
+        Flip();
+    } 
+    // If knockback is negative, enemy is on the right, so player should face right
+    else if (knockback.x < 0 && !isFacingRight) {
+        Flip();
     }
+}
 }

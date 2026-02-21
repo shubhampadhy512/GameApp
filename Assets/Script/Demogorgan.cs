@@ -2,20 +2,19 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(Damageable))]
 public class Demogorgan : MonoBehaviour
 {
-    [Header("Movement")]
+    [Header("Movement Settings")]
     public float walkSpeed = 3f;
-    public float walkStopRate = 0.05f; // How fast the enemy slides to a stop
+    public float walkStopRate = 0.6f; // Adjusted for Unity 6 linearVelocity
     public DetectionZone attackZone;
 
     private Rigidbody2D rb;
     private Animator anim;
-    private SpriteRenderer sr;
+    private Damageable damageable;
     private Transform player;
 
-    // Internal property to handle "hasTarget" boolean in the animator
     private bool _hasTarget = false;
     public bool HasTarget
     {
@@ -27,17 +26,11 @@ public class Demogorgan : MonoBehaviour
         }
     }
 
-    // NEW: Property to read "canMove" from the Animator
-    public bool CanMove
-    {
-        get { return anim.GetBool("canMove"); }
-    }
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        sr = GetComponent<SpriteRenderer>();
+        damageable = GetComponent<Damageable>();
     }
 
     private void Start()
@@ -48,43 +41,57 @@ public class Demogorgan : MonoBehaviour
 
     private void Update()
     {
-        if (player == null) return;
+        if (player == null || !damageable.IsAlive) return;
 
+        // Check for player in attack zone
         if (attackZone != null)
         {
             HasTarget = attackZone.detectedColliders.Count > 0;
         }
 
-        float direction = player.position.x - transform.position.x;
+        // Determine direction to player
+        float directionX = player.position.x - transform.position.x;
 
-        if (direction > 0)
-            sr.flipX = false;
-        else if (direction < 0)
-            sr.flipX = true;
+        // Flip based on localScale so hitboxes rotate correctly
+        if (directionX > 0.1f && transform.localScale.x < 0)
+        {
+            Flip();
+        }
+        else if (directionX < -0.1f && transform.localScale.x > 0)
+        {
+            Flip();
+        }
 
-        anim.SetBool("isWalking", Mathf.Abs(direction) > 0.1f);
+        anim.SetBool("isWalking", Mathf.Abs(rb.linearVelocity.x) > 0.1f);
     }
 
     private void FixedUpdate()
     {
-        if (player == null) return;
+        // Stop movement if damageable is in a 'hit' or 'attacking' state
+        if (damageable.LockVelocity) return;
 
-        // NEW: Check if the Animator allows movement
-        if (CanMove)
+        if (player != null && !HasTarget)
         {
-            float direction = player.position.x - rb.position.x;
-            rb.linearVelocity = new Vector2(
-                Mathf.Sign(direction) * walkSpeed,
-                rb.linearVelocity.y
-            );
+            float direction = Mathf.Sign(player.position.x - rb.position.x);
+            rb.linearVelocity = new Vector2(direction * walkSpeed, rb.linearVelocity.y);
         }
         else
         {
-            // NEW: Smoothly slide to a stop if attacking/hit/dead
-            rb.linearVelocity = new Vector2(
-                Mathf.Lerp(rb.linearVelocity.x, 0, walkStopRate),
-                rb.linearVelocity.y
-            );
+            // Smoothly decelerate to zero
+            rb.linearVelocity = new Vector2(Mathf.Lerp(rb.linearVelocity.x, 0, walkStopRate), rb.linearVelocity.y);
         }
+    }
+
+    private void Flip()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
+
+    // This is called by the Damageable Hit Event in the Inspector
+    public void OnHit(int damage, Vector2 knockback)
+    {
+        rb.linearVelocity = new Vector2(knockback.x, rb.linearVelocity.y + knockback.y);
     }
 }
