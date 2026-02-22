@@ -1,14 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events; // Required for UnityEvent
+using UnityEngine.Events;
 
 public class Damageable : MonoBehaviour
 {
     Animator animator;
 
-    // Changes: Added UnityEvent to notify other scripts (like PlayerController) when a hit occurs
-    // This allows us to pass the damage amount and the knockback vector
+    // Event to notify other scripts when hit
     public UnityEvent<int, Vector2> damageableHit;
 
     [SerializeField]
@@ -27,6 +26,7 @@ public class Damageable : MonoBehaviour
         set
         {
             _health = value;
+
             if (_health <= 0)
             {
                 IsAlive = false;
@@ -36,19 +36,30 @@ public class Damageable : MonoBehaviour
 
     [SerializeField]
     private bool _isAlive = true;
+
+    // 👇 Facing direction tracker
+    [SerializeField]
+    private bool isFacingRight = true;
+
     public bool IsAlive
     {
         get { return _isAlive; }
         set
         {
             _isAlive = value;
-            animator.SetBool("IsAlive", value); // Ensure string matches Animator parameter exactly
+            animator.SetBool("IsAlive", value);
+
+            // 👇 Only flip when character dies
+            if (!value)
+            {
+                Flip();
+            }
+
             Debug.Log("IsAlive set to " + value);
         }
     }
 
-    // Changes: Property to check/set the "lockVelocity" boolean in the animator
-    // This stops the character from moving during the knockback/hit animation
+    // Controls movement locking during hit
     public bool LockVelocity
     {
         get { return animator.GetBool("lockVelocity"); }
@@ -57,6 +68,7 @@ public class Damageable : MonoBehaviour
 
     [SerializeField]
     private bool isInvincible = false;
+
     private float timeSinceHit = 0;
     public float invincibilityTime = 0.25f;
 
@@ -79,22 +91,36 @@ public class Damageable : MonoBehaviour
         }
     }
 
-    // Changes: Updated Hit function to accept knockback and return a bool
+    // 👇 Flip function (only used on death)
+    private void Flip()
+    {
+        isFacingRight = !isFacingRight;
+
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
+
+    // Hit function
     public bool Hit(int damage, Vector2 knockback)
     {
         if (IsAlive && !isInvincible)
         {
             Health -= damage;
+
             isInvincible = true;
-            timeSinceHit = 0; // Reset the timer here!
+            timeSinceHit = 0;
 
             animator.SetTrigger("hit");
             LockVelocity = true;
+
             damageableHit?.Invoke(damage, knockback);
-            Debug.Log(Health);
+
+            Debug.Log("Current Health: " + Health);
 
             return true;
         }
+
         return false;
     }
 }
