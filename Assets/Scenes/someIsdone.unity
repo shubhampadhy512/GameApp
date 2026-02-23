@@ -2209,6 +2209,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   attackDamage: 10
   knockback: {x: 10, y: 2}
+  targetTag: Player
 --- !u!1 &1605610122
 GameObject:
   m_ObjectHideFlags: 0
@@ -2620,7 +2621,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5760143143744879983, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.33412
+      value: -4.33412
       objectReference: {fileID: 0}
     - target: {fileID: 5760143143744879983, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2676,7 +2677,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8169631004466730864, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1886787268355349320, guid: a1cdbcaf8842ac84cbde3bf25e737e8e, type: 3}
@@ -2818,7 +2819,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3005772578980824850, guid: f84c5210f3730824cbc2965f67e9e0ca, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3005772578980824850, guid: f84c5210f3730824cbc2965f67e9e0ca, type: 3}
       propertyPath: m_Offset.x
