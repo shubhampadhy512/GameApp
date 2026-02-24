@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 35623936745096980}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.9223458, y: 1.3731525, z: 0}
+  m_LocalPosition: {x: 1.6815885, y: 1.3164327, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -239,6 +239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Attack
   attackDamage: 5
   knockback: {x: 0, y: 3}
+  targetTag: Enemy
 --- !u!1 &8795103372418173625
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,6 +421,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   speed: 5
   jumpForce: 8
+  slideSpeed: 8
+  slideDuration: 0.5
   groundFilter:
     useTriggers: 0
     useLayerMask: 1
