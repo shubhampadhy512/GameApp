@@ -10,12 +10,19 @@ public class Damageable : MonoBehaviour
     // Event to notify other scripts when hit
     public UnityEvent<int, Vector2> damageableHit;
 
+    [Header("UI Reference")]
+    public HealthBar healthBar;
+
     [SerializeField]
     private int _maxHealth = 100;
     public int MaxHealth
     {
         get { return _maxHealth; }
-        set { _maxHealth = value; }
+        set
+        {
+            _maxHealth = value;
+            if (healthBar != null) healthBar.SetMaxHealth(_maxHealth);
+        }
     }
 
     [SerializeField]
@@ -25,7 +32,12 @@ public class Damageable : MonoBehaviour
         get { return _health; }
         set
         {
-            _health = value;
+            _health = Mathf.Clamp(value, 0, MaxHealth);
+
+            if (healthBar != null)
+            {
+                healthBar.SetHealth(_health);
+            }
 
             if (_health <= 0)
             {
@@ -37,7 +49,6 @@ public class Damageable : MonoBehaviour
     [SerializeField]
     private bool _isAlive = true;
 
-    // 👇 Facing direction tracker
     [SerializeField]
     private bool isFacingRight = true;
 
@@ -47,23 +58,25 @@ public class Damageable : MonoBehaviour
         set
         {
             _isAlive = value;
-            animator.SetBool("IsAlive", value);
-
-            // 👇 Only flip when character dies
-            if (!value)
+            if (animator != null)
             {
-                Flip();
+                animator.SetBool("IsAlive", value);
+
+                if (!value)
+                {
+                    animator.SetTrigger("die");
+                    Flip();
+                }
             }
 
             Debug.Log("IsAlive set to " + value);
         }
     }
 
-    // Controls movement locking during hit
     public bool LockVelocity
     {
-        get { return animator.GetBool("lockVelocity"); }
-        set { animator.SetBool("lockVelocity", value); }
+        get { return animator != null && animator.GetBool("lockVelocity"); }
+        set { if (animator != null) animator.SetBool("lockVelocity", value); }
     }
 
     [SerializeField]
@@ -75,6 +88,19 @@ public class Damageable : MonoBehaviour
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        if (animator == null)
+        {
+            Debug.LogWarning("Animator not found on Damageable object!");
+        }
+    }
+
+    private void Start()
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(MaxHealth);
+            healthBar.SetHealth(Health);
+        }
     }
 
     private void Update()
@@ -91,7 +117,6 @@ public class Damageable : MonoBehaviour
         }
     }
 
-    // 👇 Flip function (only used on death)
     private void Flip()
     {
         isFacingRight = !isFacingRight;
@@ -101,7 +126,6 @@ public class Damageable : MonoBehaviour
         transform.localScale = scale;
     }
 
-    // Hit function
     public bool Hit(int damage, Vector2 knockback)
     {
         if (IsAlive && !isInvincible)
@@ -111,8 +135,11 @@ public class Damageable : MonoBehaviour
             isInvincible = true;
             timeSinceHit = 0;
 
-            animator.SetTrigger("hit");
-            LockVelocity = true;
+            if (animator != null)
+            {
+                animator.SetTrigger("hit");
+                LockVelocity = true;
+            }
 
             damageableHit?.Invoke(damage, knockback);
 
