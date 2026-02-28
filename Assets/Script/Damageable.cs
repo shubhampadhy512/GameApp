@@ -1,28 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.Events; // Required for UnityEvent
 
 public class Damageable : MonoBehaviour
 {
     Animator animator;
 
-    // Event to notify other scripts when hit
+    // Changes: Added UnityEvent to notify other scripts (like PlayerController) when a hit occurs
+    // This allows us to pass the damage amount and the knockback vector
     public UnityEvent<int, Vector2> damageableHit;
-
-    [Header("UI Reference")]
-    public HealthBar healthBar;
 
     [SerializeField]
     private int _maxHealth = 100;
     public int MaxHealth
     {
         get { return _maxHealth; }
-        set
-        {
-            _maxHealth = value;
-            if (healthBar != null) healthBar.SetMaxHealth(_maxHealth);
-        }
+        set { _maxHealth = value; }
     }
 
     [SerializeField]
@@ -32,13 +26,7 @@ public class Damageable : MonoBehaviour
         get { return _health; }
         set
         {
-            _health = Mathf.Clamp(value, 0, MaxHealth);
-
-            if (healthBar != null)
-            {
-                healthBar.SetHealth(_health);
-            }
-
+            _health = value;
             if (_health <= 0)
             {
                 IsAlive = false;
@@ -48,59 +36,33 @@ public class Damageable : MonoBehaviour
 
     [SerializeField]
     private bool _isAlive = true;
-
-    [SerializeField]
-    private bool isFacingRight = true;
-
     public bool IsAlive
     {
         get { return _isAlive; }
         set
         {
             _isAlive = value;
-            if (animator != null)
-            {
-                animator.SetBool("IsAlive", value);
-
-                if (!value)
-                {
-                    animator.SetTrigger("die");
-                    Flip();
-                }
-            }
-
+            animator.SetBool("IsAlive", value); // Ensure string matches Animator parameter exactly
             Debug.Log("IsAlive set to " + value);
         }
     }
 
+    // Changes: Property to check/set the "lockVelocity" boolean in the animator
+    // This stops the character from moving during the knockback/hit animation
     public bool LockVelocity
     {
-        get { return animator != null && animator.GetBool("lockVelocity"); }
-        set { if (animator != null) animator.SetBool("lockVelocity", value); }
+        get { return animator.GetBool("lockVelocity"); }
+        set { animator.SetBool("lockVelocity", value); }
     }
 
     [SerializeField]
     private bool isInvincible = false;
-
     private float timeSinceHit = 0;
     public float invincibilityTime = 0.25f;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        if (animator == null)
-        {
-            Debug.LogWarning("Animator not found on Damageable object!");
-        }
-    }
-
-    private void Start()
-    {
-        if (healthBar != null)
-        {
-            healthBar.SetMaxHealth(MaxHealth);
-            healthBar.SetHealth(Health);
-        }
     }
 
     private void Update()
@@ -117,37 +79,22 @@ public class Damageable : MonoBehaviour
         }
     }
 
-    private void Flip()
-    {
-        isFacingRight = !isFacingRight;
-
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
-    }
-
+    // Changes: Updated Hit function to accept knockback and return a bool
     public bool Hit(int damage, Vector2 knockback)
     {
         if (IsAlive && !isInvincible)
         {
             Health -= damage;
-
             isInvincible = true;
-            timeSinceHit = 0;
+            timeSinceHit = 0; // Reset the timer here!
 
-            if (animator != null)
-            {
-                animator.SetTrigger("hit");
-                LockVelocity = true;
-            }
-
+            animator.SetTrigger("hit");
+            LockVelocity = true;
             damageableHit?.Invoke(damage, knockback);
-
-            Debug.Log("Current Health: " + Health);
+            Debug.Log(Health);
 
             return true;
         }
-
         return false;
     }
 }

@@ -7,7 +7,7 @@ public class Demogorgan : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float walkSpeed = 3f;
-    public float walkStopRate = 0.6f;
+    public float walkStopRate = 0.6f; // Adjusted for Unity 6 linearVelocity
     public DetectionZone attackZone;
 
     private Rigidbody2D rb;
@@ -22,7 +22,7 @@ public class Demogorgan : MonoBehaviour
         private set
         {
             _hasTarget = value;
-            anim.SetBool("hasTarget", value);
+            if (anim != null) anim.SetBool("hasTarget", value);
         }
     }
 
@@ -36,39 +36,23 @@ public class Demogorgan : MonoBehaviour
     private void Start()
     {
         GameObject p = GameObject.FindGameObjectWithTag("Player");
-        if (p != null)
-            player = p.transform;
+        if (p != null) player = p.transform;
     }
 
     private void Update()
     {
-        // Stop everything if enemy is dead
-        if (!damageable.IsAlive)
-            return;
+        if (player == null || !damageable.IsAlive) return;
 
-        // Stop if player does not exist
-        if (player == null)
-            return;
-
-        Damageable playerDamageable = player.GetComponent<Damageable>();
-
-        // 👇 STOP if player is dead
-        if (playerDamageable == null || !playerDamageable.IsAlive)
-        {
-            HasTarget = false;
-            anim.SetBool("isWalking", false);
-            return;
-        }
-
-        // Check attack zone
+        // Check for player in attack zone
         if (attackZone != null)
         {
             HasTarget = attackZone.detectedColliders.Count > 0;
         }
 
-        // Flip towards player
+        // Determine direction to player
         float directionX = player.position.x - transform.position.x;
 
+        // Flip based on localScale so hitboxes rotate correctly
         if (directionX > 0.1f && transform.localScale.x < 0)
         {
             Flip();
@@ -83,30 +67,18 @@ public class Demogorgan : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!damageable.IsAlive)
-            return;
+        // Stop movement if damageable is in a 'hit' or 'attacking' state
+        if (damageable.LockVelocity) return;
 
-        if (damageable.LockVelocity)
-            return;
-
-        if (player == null)
-            return;
-
-        Damageable playerDamageable = player.GetComponent<Damageable>();
-
-        // 👇 Only move if player is alive AND not in attack range
-        if (playerDamageable != null && playerDamageable.IsAlive && !HasTarget)
+        if (player != null && !HasTarget)
         {
             float direction = Mathf.Sign(player.position.x - rb.position.x);
             rb.linearVelocity = new Vector2(direction * walkSpeed, rb.linearVelocity.y);
         }
         else
         {
-            // Smooth deceleration
-            rb.linearVelocity = new Vector2(
-                Mathf.Lerp(rb.linearVelocity.x, 0, walkStopRate),
-                rb.linearVelocity.y
-            );
+            // Smoothly decelerate to zero
+            rb.linearVelocity = new Vector2(Mathf.Lerp(rb.linearVelocity.x, 0, walkStopRate), rb.linearVelocity.y);
         }
     }
 
@@ -117,15 +89,9 @@ public class Demogorgan : MonoBehaviour
         transform.localScale = scale;
     }
 
-    // Called by Damageable Hit Event
+    // This is called by the Damageable Hit Event in the Inspector
     public void OnHit(int damage, Vector2 knockback)
     {
-        if (!damageable.IsAlive)
-            return;
-
-        rb.linearVelocity = new Vector2(
-            knockback.x,
-            rb.linearVelocity.y + knockback.y
-        );
+        rb.linearVelocity = new Vector2(knockback.x, rb.linearVelocity.y + knockback.y);
     }
 }

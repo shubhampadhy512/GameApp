@@ -4,22 +4,19 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Collider2D))]
-[RequireComponent(typeof(Damageable))]
+[RequireComponent(typeof(Damageable))] // Added: Ensure Damageable exists
 public class PlayerController : MonoBehaviour
 {
     // Components
     private Rigidbody2D rb;
     private Animator animator;
-    private Damageable damageable;
+    private Damageable damageable; // Added reference
 
     // Movement
     private Vector2 moveInput;
-
     [Header("Movement Settings")]
     public float speed = 5f;
     public float jumpForce = 7f;
-    public float slideSpeed = 8f;
-    public float slideDuration = 0.5f;
 
     // Ground check
     [Header("Ground Check")]
@@ -30,52 +27,33 @@ public class PlayerController : MonoBehaviour
     private bool isFacingRight = true;
     private bool isMoving;
 
-    // Sliding
-    private bool isSliding;
-    private float slideTimer;
-
-    // Animator parameters
+    // Animator params
     private const string IS_MOVING = "isMoving";
     private const string IS_GROUNDED = "isGrounded";
     private const string ATTACK_TRIGGER = "Attack";
     private const string ATTACK_STATE = "attack_1";
-    private const string IS_SLIDING = "isSliding";
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        damageable = GetComponent<Damageable>();
+        damageable = GetComponent<Damageable>(); // Initialize damageable
     }
 
     private void FixedUpdate()
     {
-        if (!damageable.IsAlive)
-        {
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-            animator.SetBool(IS_MOVING, false);
-            return;
-        }
-
         // Ground check
         isGrounded = rb.IsTouching(groundFilter);
         animator.SetBool(IS_GROUNDED, isGrounded);
 
-        // Stop movement during knockback
+        // Changes: Check LockVelocity from Damageable script
+        // If the character is being hit/knocked back, do not process move input
         if (damageable.LockVelocity)
-            return;
-
-        // Handle sliding
-        if (isSliding)
         {
-            rb.linearVelocity = new Vector2((isFacingRight ? 1 : -1) * slideSpeed, rb.linearVelocity.y);
-            slideTimer -= Time.fixedDeltaTime;
-            if (slideTimer <= 0)
-                StopSlide();
             return;
         }
 
-        // Stop movement during attack
+        // If attack animation is playing → lock movement
         if (IsAttacking())
         {
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
@@ -92,8 +70,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        if (!damageable.IsAlive) return;
-        if (IsAttacking() || damageable.LockVelocity || isSliding) return;
+        // Added: Prevent flipping or updating input during knockback/hit
+        if (IsAttacking() || damageable.LockVelocity) return;
 
         moveInput = context.ReadValue<Vector2>();
         isMoving = Mathf.Abs(moveInput.x) > 0.01f;
@@ -106,9 +84,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (!damageable.IsAlive) return;
-
-        if (context.performed && isGrounded && !IsAttacking() && !damageable.LockVelocity && !isSliding)
+        // Added: Prevent jumping during hit
+        if (context.performed && isGrounded && !IsAttacking() && !damageable.LockVelocity)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
@@ -116,21 +93,12 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        if (!damageable.IsAlive) return;
         if (!context.performed) return;
-        if (IsAttacking() || damageable.LockVelocity || isSliding) return;
+        // Added: Prevent attacking during hit
+        if (IsAttacking() || damageable.LockVelocity) return;
 
         animator.ResetTrigger(ATTACK_TRIGGER);
         animator.SetTrigger(ATTACK_TRIGGER);
-    }
-
-    public void OnSlide(InputAction.CallbackContext context)
-    {
-        if (!damageable.IsAlive) return;
-        if (!context.performed) return;
-        if (!isGrounded || IsAttacking() || damageable.LockVelocity || isSliding) return;
-
-        StartSlide();
     }
 
     // ================= HELPERS =================
@@ -148,30 +116,21 @@ public class PlayerController : MonoBehaviour
         transform.localScale = scale;
     }
 
-    // ================= SLIDE =================
-
-    private void StartSlide()
-    {
-        isSliding = true;
-        slideTimer = slideDuration;
-        animator.SetBool(IS_SLIDING, true);
-    }
-
-    private void StopSlide()
-    {
-        isSliding = false;
-        animator.SetBool(IS_SLIDING, false);
-    }
-
     // ================= DAMAGE & KNOCKBACK =================
 
-    public void OnHit(int damage, Vector2 knockback)
-    {
-        rb.linearVelocity = new Vector2(knockback.x, rb.linearVelocity.y + knockback.y);
+ public void OnHit(int damage, Vector2 knockback)
+{
+    // Apply knockback physics
+    rb.linearVelocity = new Vector2(knockback.x, rb.linearVelocity.y + knockback.y);
 
-        if (knockback.x > 0 && isFacingRight)
-            Flip();
-        else if (knockback.x < 0 && !isFacingRight)
-            Flip();
+    // Force player to face the enemy that hit them
+    // If knockback is positive, enemy is on the left, so player should face left
+    if (knockback.x > 0 && isFacingRight) {
+        Flip();
+    } 
+    // If knockback is negative, enemy is on the right, so player should face right
+    else if (knockback.x < 0 && !isFacingRight) {
+        Flip();
     }
+}
 }
