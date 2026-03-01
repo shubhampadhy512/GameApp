@@ -1,20 +1,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// DetectionZone.cs
 public class DetectionZone : MonoBehaviour
 {
-    // List of colliders currently inside the zone
     public List<Collider2D> detectedColliders = new List<Collider2D>();
-    Collider2D col;
 
-    private void Awake()
+    private void Update()
     {
-        col = GetComponent<Collider2D>();
+        detectedColliders.RemoveAll(c =>
+        {
+            if (c == null) return true;
+            Damageable d = c.GetComponentInParent<Damageable>();
+            return d == null || !d.IsAlive;
+        });
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        detectedColliders.Add(collision);
+        Damageable damageable = collision.GetComponentInParent<Damageable>();
+        if (damageable != null && damageable.IsAlive)
+        {
+            if (!detectedColliders.Contains(collision))
+                detectedColliders.Add(collision);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)

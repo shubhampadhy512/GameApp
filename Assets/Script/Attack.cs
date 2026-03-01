@@ -2,33 +2,52 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
+    [Header("Attack Settings")]
     public int attackDamage = 10;
-    public Vector2 knockback = Vector2.zero;
+    public Vector2 knockback = new Vector2(5f, 2f);
+
+    [Header("Target Settings")]
+    [Tooltip("Which tag this attack should damage (e.g. 'Enemy' or 'Player')")]
+    public string targetTag = "Enemy"; // default: player attacks enemies
+
+    private Collider2D attackCollider;
+
+    private void Awake()
+    {
+        attackCollider = GetComponent<Collider2D>();
+        attackCollider.enabled = false; // disabled until attack starts
+    }
+
+    // Called from animation event when attack begins
+    public void StartAttack()
+    {
+        attackCollider.enabled = true;
+    }
+
+    // Called from animation event when attack ends
+    public void EndAttack()
+    {
+        attackCollider.enabled = false;
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("I touched: " + collision.name);
+        Debug.Log("Hit something: " + collision.name);
 
-        // Change GetComponent to GetComponentInParent
+        // Only damage objects with the correct tag
+        if (!collision.CompareTag(targetTag)) return;
+
         Damageable damageable = collision.GetComponentInParent<Damageable>();
 
-        if (damageable != null)
+        if (damageable != null && damageable.IsAlive)
         {
-            Vector2 deliveredKnockback = transform.parent.localScale.x > 0
+            // Flip knockback direction depending on facing
+            Vector2 deliveredKnockback =
+                transform.parent.localScale.x > 0
                 ? knockback
                 : new Vector2(-knockback.x, knockback.y);
 
-            bool gotHit = damageable.Hit(attackDamage, deliveredKnockback);
-
-            if (gotHit)
-            {
-                Debug.Log(collision.name + " hit for " + attackDamage);
-            }
-        }
-        else
-        {
-            // This will tell us if the script is still missing
-            Debug.Log("Touched " + collision.name + " but no Damageable script found!");
+            damageable.Hit(attackDamage, deliveredKnockback);
         }
     }
 }

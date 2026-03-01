@@ -1,11 +1,21 @@
 using UnityEngine;
 
-public class ProjectTileLuncher : MonoBehaviour
+public class ProjectileLauncher : MonoBehaviour
 {
     public GameObject projectilePrefab;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public void FiredProjectile()
+    public Transform launchPoint;
+
+    // This function is called by an Animation Event
+    public void FireProjectile()
     {
-        Instantiate(projectilePrefab,transform.position,projectilePrefab.transform.rotation);
+        GameObject projectile = Instantiate(projectilePrefab, launchPoint.position, projectilePrefab.transform.rotation);
+        Vector3 origScale = projectile.transform.localScale;
+
+        // Flip the projectile's scale based on the player's facing direction
+        projectile.transform.localScale = new Vector3(
+            origScale.x * (transform.localScale.x > 0 ? 1 : -1),
+            origScale.y,
+            origScale.z
+        );
     }
 }
