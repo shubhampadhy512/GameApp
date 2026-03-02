@@ -32,8 +32,6 @@ public class Attack : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Hit something: " + collision.name);
-
         // Only damage objects with the correct tag
         if (!collision.CompareTag(targetTag)) return;
 
