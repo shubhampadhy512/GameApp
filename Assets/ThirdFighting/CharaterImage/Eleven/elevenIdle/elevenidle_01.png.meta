@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b2781696ac289234da157adca657c69f
+guid: 29d418a189abddb4099480ad15209e5a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6437399196451290483
-    second: groundtiles_0
+      213: 3401593827581616626
+    second: elevenidle_01_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: groundtiles_0
+      name: elevenidle_01_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1024
-        height: 590
+        x: 37
+        y: 6
+        width: 127
+        height: 473
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d82c222a983c9a6a0800000000000000
-      internalID: -6437399196451290483
+      spriteID: 2f1e9235093e43f20800000000000000
+      internalID: 3401593827581616626
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: a059eab3311eaa64186524b5896f0c11
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      groundtiles_0: -6437399196451290483
+      elevenidle_01_0: 3401593827581616626
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
