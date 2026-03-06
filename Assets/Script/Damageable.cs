@@ -7,26 +7,24 @@ public class Damageable : MonoBehaviour
 {
     Animator animator;
 
-    // Event to notify other scripts when hit
     public UnityEvent<int, Vector2> damageableHit;
 
     [Header("UI Reference")]
     public HealthBar healthBar;
 
-    [SerializeField]
-    private int _maxHealth = 100;
+    [SerializeField] private int _maxHealth = 100;
     public int MaxHealth
     {
         get { return _maxHealth; }
         set
         {
             _maxHealth = value;
-            if (healthBar != null) healthBar.SetMaxHealth(_maxHealth);
+            if (healthBar != null)
+                healthBar.SetMaxHealth(_maxHealth);
         }
     }
 
-    [SerializeField]
-    private int _health = 100;
+    [SerializeField] private int _health = 100;
     public int Health
     {
         get { return _health; }
@@ -35,59 +33,56 @@ public class Damageable : MonoBehaviour
             _health = Mathf.Clamp(value, 0, MaxHealth);
 
             if (healthBar != null)
-            {
                 healthBar.SetHealth(_health);
-            }
 
-            if (_health <= 0)
+            if (_health <= 0 && IsAlive)
             {
                 IsAlive = false;
             }
         }
     }
 
-    [SerializeField]
-    private bool _isAlive = true;
-
-    [SerializeField]
-    private bool isFacingRight = true;
-
+    [SerializeField] private bool _isAlive = true;
     public bool IsAlive
     {
         get { return _isAlive; }
         set
         {
+            if (_isAlive == value) return;
+
             _isAlive = value;
+
             if (animator != null)
             {
                 animator.SetBool("IsAlive", value);
 
                 if (!value)
                 {
+                    Debug.Log("DEATH TRIGGER CALLED");
                     animator.SetTrigger("die");
-                    Flip();
                 }
             }
-
-            Debug.Log("IsAlive set to " + value);
         }
     }
 
     public bool LockVelocity
     {
         get { return animator != null && animator.GetBool("lockVelocity"); }
-        set { if (animator != null) animator.SetBool("lockVelocity", value); }
+        set
+        {
+            if (animator != null)
+                animator.SetBool("lockVelocity", value);
+        }
     }
 
-    [SerializeField]
-    private bool isInvincible = false;
-
-    private float timeSinceHit = 0;
+    [SerializeField] private bool isInvincible = false;
+    private float timeSinceHit = 0f;
     public float invincibilityTime = 0.25f;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
+
         if (animator == null)
         {
             Debug.LogWarning("Animator not found on Damageable object!");
@@ -107,47 +102,36 @@ public class Damageable : MonoBehaviour
     {
         if (isInvincible)
         {
+            timeSinceHit += Time.deltaTime;
+
             if (timeSinceHit > invincibilityTime)
             {
                 isInvincible = false;
-                timeSinceHit = 0;
+                timeSinceHit = 0f;
             }
-
-            timeSinceHit += Time.deltaTime;
         }
-    }
-
-    private void Flip()
-    {
-        isFacingRight = !isFacingRight;
-
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
     }
 
     public bool Hit(int damage, Vector2 knockback)
     {
-        if (IsAlive && !isInvincible)
+        if (!IsAlive || isInvincible)
+            return false;
+
+        Health -= damage;
+
+        isInvincible = true;
+        timeSinceHit = 0f;
+
+        if (animator != null)
         {
-            Health -= damage;
-
-            isInvincible = true;
-            timeSinceHit = 0;
-
-            if (animator != null)
-            {
-                animator.SetTrigger("hit");
-                LockVelocity = true;
-            }
-
-            damageableHit?.Invoke(damage, knockback);
-
-            Debug.Log("Current Health: " + Health);
-
-            return true;
+            animator.SetTrigger("hit");
+            LockVelocity = true;
         }
 
-        return false;
+        damageableHit?.Invoke(damage, knockback);
+
+        Debug.Log("Current Health: " + Health);
+
+        return true;
     }
 }
