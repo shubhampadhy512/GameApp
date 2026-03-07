@@ -174,11 +174,15 @@ public class PlayerController : MonoBehaviour
         else if (knockback.x < 0 && !isFacingRight)
             Flip();
     }
-    public void SetMoveInput(Vector2 input)
+ // Inside your PlayerController.cs
+public void SetMoveInput(Vector2 input)
 {
+    if (!damageable.IsAlive) return;
+    
     moveInput = input;
     isMoving = Mathf.Abs(moveInput.x) > 0.01f;
 
+    // Handle Flipping for the fighting game feel
     if (moveInput.x > 0 && !isFacingRight)
         Flip();
     else if (moveInput.x < 0 && isFacingRight)
