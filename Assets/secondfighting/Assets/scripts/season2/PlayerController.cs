@@ -149,6 +149,7 @@ namespace Season2
         private Rigidbody2D rb;
         private Animator animator;
         private Damageable damageable;
+        private PlayerAudioManager2 playerAudio;
 
         // Movement
         private Vector2 moveInput;
@@ -177,6 +178,9 @@ namespace Season2
             rb = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
             damageable = GetComponent<Damageable>();
+
+            // Get PlayerAudioManager
+            playerAudio = GetComponent<PlayerAudioManager2>();
         }
 
         private void FixedUpdate()
@@ -198,7 +202,7 @@ namespace Season2
             animator.SetBool(IS_MOVING, isMoving);
         }
 
-        // ================= INPUT SYSTEM =================
+        // ================= INPUT =================
 
         public void OnMove(InputAction.CallbackContext context)
         {
@@ -229,6 +233,8 @@ namespace Season2
             }
         }
 
+        // ================= ATTACK =================
+
         public void OnAttack(InputAction.CallbackContext context)
         {
             if (!context.performed) return;
@@ -236,17 +242,23 @@ namespace Season2
 
             animator.ResetTrigger(ATTACK_TRIGGER);
             animator.SetTrigger(ATTACK_TRIGGER);
+
+            if (playerAudio != null)
+                playerAudio.PlayAttack();
         }
+
         public void AttackButton()
         {
             if (IsAttacking()) return;
 
             animator.ResetTrigger(ATTACK_TRIGGER);
             animator.SetTrigger(ATTACK_TRIGGER);
+
+            if (playerAudio != null)
+                playerAudio.PlayAttack();
         }
 
-
-        // ================= JOYSTICK SUPPORT =================
+        // ================= JOYSTICK =================
 
         public void SetMoveInput(Vector2 input)
         {
@@ -277,20 +289,19 @@ namespace Season2
             transform.localScale = scale;
         }
 
-        // ================= DAMAGE & KNOCKBACK =================
+        // ================= DAMAGE =================
 
         public void OnHit(int damage, Vector2 knockback)
         {
             rb.linearVelocity = new Vector2(knockback.x, rb.linearVelocity.y + knockback.y);
 
+            if (playerAudio != null)
+                playerAudio.PlayHit();
+
             if (knockback.x > 0 && isFacingRight)
-            {
                 Flip();
-            }
             else if (knockback.x < 0 && !isFacingRight)
-            {
                 Flip();
-            }
         }
     }
 }

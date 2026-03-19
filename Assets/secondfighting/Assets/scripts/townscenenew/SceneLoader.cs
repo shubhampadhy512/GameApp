@@ -10,7 +10,7 @@ namespace Season2
         public void LoadFightScene()
         {
             sceneToLoad = "SEASON2";
-            SceneManager.LoadScene("LoadingScene2");
+            SceneManager.LoadScene("Season2FightingLoader");
         }
     }
 }

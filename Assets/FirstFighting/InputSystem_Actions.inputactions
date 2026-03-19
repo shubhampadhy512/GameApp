@@ -387,7 +387,7 @@
                 {
                     "name": "",
                     "id": "eb40bb66-4559-4dfa-9a2f-820438abb426",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -486,7 +486,7 @@
                 {
                     "name": "",
                     "id": "f8ba4f03-7032-4199-ac75-f12cff4310d8",
-                    "path": "<Keyboard>/b",
+                    "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",

@@ -4,22 +4,24 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public GameObject gameOverUI;
+    public GameObject victoryUI;
 
     void Start()
     {
-        // Hide and lock cursor at start
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
         if (gameOverUI != null)
-        {
             gameOverUI.SetActive(false);
-        }
+
+        if (victoryUI != null)
+            victoryUI.SetActive(false);
     }
 
     void Update()
     {
-        if (gameOverUI != null && gameOverUI.activeInHierarchy)
+        if ((gameOverUI != null && gameOverUI.activeInHierarchy) ||
+            (victoryUI != null && victoryUI.activeInHierarchy))
         {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
@@ -34,26 +36,27 @@ public class GameManager : MonoBehaviour
     public void gameOver()
     {
         if (gameOverUI != null)
-        {
             gameOverUI.SetActive(true);
-        }
+    }
+
+    public void victory()
+    {
+        if (victoryUI != null)
+            victoryUI.SetActive(true);
     }
 
     public void restart()
     {
-        Debug.Log("Restarting...");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void mainMenu()
     {
-        Debug.Log("Loading Main Menu...");
         SceneManager.LoadScene("main menu");
     }
 
     public void quit()
     {
-        Debug.Log("Quitting Game...");
         Application.Quit();
     }
 }

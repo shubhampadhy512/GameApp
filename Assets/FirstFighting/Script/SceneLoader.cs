@@ -8,6 +8,6 @@ public class SceneLoader : MonoBehaviour
     public void LoadFightScene()
     {
         sceneToLoad = "SEASON1";
-         SceneManager.LoadScene("LoadingScene");
+         SceneManager.LoadScene("LoadingScene2");
     }
 }

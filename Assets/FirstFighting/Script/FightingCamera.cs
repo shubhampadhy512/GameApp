@@ -4,7 +4,7 @@ using UnityEngine;
 public class FightingCamera : MonoBehaviour
 {
     public float baseWidth = 16f;
-    public float baseHeight = 10f;
+    public float baseHeight = 11f;
 
     private Camera cam;
 

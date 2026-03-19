@@ -13,11 +13,25 @@ namespace Season2
         public UnityEvent<int, Vector2> damageableHit;
         public Action onDeath;
 
+        [Header("UI")]
+        public HealthBar healthBar;
+
+        [Header("Player Settings")]
+        public bool isPlayer = false;
+
+        private GameManager gameManager;
+
         [SerializeField] private int _maxHealth = 100;
         public int MaxHealth
         {
             get { return _maxHealth; }
-            set { _maxHealth = value; }
+            set
+            {
+                _maxHealth = value;
+
+                if (healthBar != null)
+                    healthBar.SetMaxHealth(_maxHealth);
+            }
         }
 
         [SerializeField] private int _health = 100;
@@ -26,7 +40,10 @@ namespace Season2
             get { return _health; }
             set
             {
-                _health = value;
+                _health = Mathf.Clamp(value, 0, MaxHealth);
+
+                if (healthBar != null)
+                    healthBar.SetHealth(_health);
 
                 if (_health <= 0 && IsAlive)
                 {
@@ -43,8 +60,17 @@ namespace Season2
             set
             {
                 _isAlive = value;
-                animator.SetBool("isAlive", value);
+
+                if (animator != null)
+                    animator.SetBool("isAlive", value);
+
                 Debug.Log("IsAlive set to " + value);
+
+                // CALL GAME OVER IF PLAYER DIES
+                if (!_isAlive && isPlayer && gameManager != null)
+                {
+                    gameManager.gameOver();
+                }
             }
         }
 
@@ -61,8 +87,23 @@ namespace Season2
         private void Awake()
         {
             animator = GetComponent<Animator>();
+        }
+
+        private void Start()
+        {
             Health = MaxHealth;
             IsAlive = true;
+
+            if (healthBar != null)
+            {
+                healthBar.SetMaxHealth(MaxHealth);
+                healthBar.SetHealth(Health);
+            }
+
+            if (isPlayer)
+            {
+                gameManager = FindObjectOfType<GameManager>();
+            }
         }
 
         private void Update()

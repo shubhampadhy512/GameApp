@@ -6,7 +6,7 @@ public class Projectile : MonoBehaviour
     public int damage = 10;
     public Vector2 knockback = new Vector2(0, 0);
 
-    Rigidbody2D rb;
+    private Rigidbody2D rb;
 
     private void Awake()
     {
@@ -15,7 +15,7 @@ public class Projectile : MonoBehaviour
 
     private void Start()
     {
-        // Set velocity based on speed and the direction the projectile is facing
+        // Move projectile forward
         rb.linearVelocity = new Vector2(moveSpeed.x * transform.localScale.x, moveSpeed.y);
     }
 
@@ -25,13 +25,12 @@ public class Projectile : MonoBehaviour
 
         if (damageable != null)
         {
-            // Apply damage and knockback
             bool gotHit = damageable.Hit(damage, knockback);
 
             if (gotHit)
             {
                 Debug.Log(collision.name + " hit for " + damage);
-                Destroy(gameObject); // Destroy arrow on impact
+                Destroy(gameObject); // Destroy projectile after hit
             }
         }
     }

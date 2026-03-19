@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 namespace Season2
@@ -19,6 +20,8 @@ namespace Season2
         private Damageable damageable;
         private Transform player;
 
+        private EnemyAudioManager2 enemyAudio;
+
         private bool _hasTarget = false;
         public bool HasTarget
         {
@@ -35,6 +38,9 @@ namespace Season2
             rb = GetComponent<Rigidbody2D>();
             anim = GetComponent<Animator>();
             damageable = GetComponent<Damageable>();
+
+            // Get Enemy Audio Manager
+            enemyAudio = GetComponent<EnemyAudioManager2>();
         }
 
         private void Start()
@@ -69,6 +75,9 @@ namespace Season2
                 if (HasTarget && !anim.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
                 {
                     anim.SetTrigger("Attack");
+
+                    if (enemyAudio != null)
+                        enemyAudio.PlayAttack();
                 }
             }
 
@@ -133,6 +142,9 @@ namespace Season2
                 knockback.x,
                 rb.linearVelocity.y + knockback.y
             );
+
+            if (enemyAudio != null)
+                enemyAudio.PlayHit();
         }
     }
 }
